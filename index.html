@@ -473,7 +473,7 @@ Flashcards respuesta 2"></textarea>
       return;
     }
     if (!app.data.subjects[subject] || !app.data.subjects[subject].themes[theme]) {
-      ShowNotification('El bloque seleccionado no existe.');
+      showNotification('El bloque seleccionado no existe.');
       return;
     }
     const lines = text.split('\n').filter(line => line.trim() !== '');
@@ -489,7 +489,7 @@ Flashcards respuesta 2"></textarea>
       app.data.subjects[subject].themes[theme].push(flashcard);
     }
     saveData();
-    ShowNotification('Flashcards agregadas correctamente.');
+    showNotification('Flashcards agregadas correctamente.');
     document.getElementById('input-flashcards-agregar').value = '';
   });
   
@@ -615,7 +615,7 @@ if (app.data.subjects[subject] && app.data.subjects[subject].themes) {
   // Renderizar la flashcard actual en modo estudio
   function renderFlashcardEstudio() {
     if (app.state.flashcards.length === 0) {
-      ShowNotification('No hay flashcards en este tema.');
+      showNotification('No hay flashcards en este tema.');
       return;
     }
     document.getElementById('estudio-temas').classList.add('hidden');
@@ -794,7 +794,7 @@ if (themes && typeof themes === 'object') {
       app.state.flashcards = allFlashcards.filter(fc => fc.difficulty === difficulty);
       app.state.currentCardIndex = 0;
       if(app.state.flashcards.length === 0) {
-        ShowNotification('No hay flashcards con esa clasificación.');
+        showNotification('No hay flashcards con esa clasificación.');
         return;
       }
       document.getElementById('repaso-dificultad').classList.add('hidden');
@@ -896,7 +896,7 @@ if (themes && typeof themes === 'object') {
     if(currentFlashcard) {
       currentFlashcard.difficulty = level;
       saveData();
-      ShowNotification('Flashcard reclasificada como ' + level);
+      showNotification('Flashcard reclasificada como ' + level);
     }
   }
   
@@ -921,7 +921,7 @@ if (themes && typeof themes === 'object') {
     const difficulty = document.getElementById('input-sesion-dificultad').value;
     const datetime = document.getElementById('input-sesion-fecha').value;
     if(!subject || !theme || !difficulty || !datetime) {
-      ShowNotification('Por favor, complete todos los campos para crear la sesión.');
+      showNotification('Por favor, complete todos los campos para crear la sesión.');
       return;
     }
     const session = {
@@ -933,7 +933,7 @@ if (themes && typeof themes === 'object') {
     };
     app.sessions.push(session);
     saveData();
-    ShowNotification('Sesión creada correctamente.');
+    showNotification('Sesión creada correctamente.');
     // Reiniciar formulario
     document.getElementById('input-sesion-asignatura').value = '';
     document.getElementById('input-sesion-tema').innerHTML = '<option value="">Selecciona un tema</option>';
@@ -986,7 +986,7 @@ if (themes && typeof themes === 'object') {
   function toggleFullScreen(elem) {
     if (!document.fullscreenElement) {
       elem.requestFullscreen().catch(err => {
-        ShowNotification(`Error al activar pantalla completa: ${err.message}`);
+        showNotification(`Error al activar pantalla completa: ${err.message}`);
       });
     } else {
       document.exitFullscreen();
@@ -1019,7 +1019,7 @@ if (themes && typeof themes === 'object') {
     if(currentFlashcard) {
       currentFlashcard.difficulty = level;
       saveData();
-      ShowNotification('Flashcard clasificada como ' + level);
+      showNotification('Flashcard clasificada como ' + level);
     }
   }
   
