@@ -466,51 +466,66 @@ Flashcards respuesta 2"></textarea>
     renderAsignaturasDropdowns();
   });
   
-  // Agregar flashcards a un bloque existente
-  document.getElementById('btn-agregar-flashcards').addEventListener('click', () => {
-    const subject = document.getElementById('select-asignatura-existente').value;
-    const theme = document.getElementById('select-tema-existente').value;
-    const text = document.getElementById('input-flashcards-agregar').value.trim();
-    if (!subject || !theme || !text) {
-      showNotification('Por favor, complete todos los campos para agregar flashcards.');
-      return;
-    }
-    if (!app.data.subjects[subject] || !app.data.subjects[subject].themes[theme]) {
-      showNotification('El bloque seleccionado no existe.');
-      return;
-    }
-    const lines = text.split('\n').filter(line => line.trim() !== '');
-    for (let i = 0; i < lines.length; i += 2) {
-      const question = lines[i];
-      const answer = lines[i+1] || '';
-      const flashcard = {
-        id: generateId(),
-        question: question,
-        answer: answer,
-        difficulty: null
-      };
-      app.data.subjects[subject].themes[theme].push(flashcard);
-    }
-    saveData();
-    showNotification('Flashcards agregadas correctamente.');
-    document.getElementById('input-flashcards-agregar').value = '';
+// Renderizar asignaturas en los dropdowns (para creación y agregar)
+function renderAsignaturasDropdowns() {
+  const asignaturasSelects = ['select-asignatura-existente'];
+  asignaturasSelects.forEach(selectId => {
+    const selectElem = document.getElementById(selectId);
+    selectElem.innerHTML = '<option value="">Selecciona una asignatura</option>';
+    Object.keys(app.data.subjects).forEach(subject => {
+      const option = document.createElement('option');
+      option.value = subject;
+      option.textContent = subject;
+      selectElem.appendChild(option);
+    });
   });
-  
-  // Renderizar asignaturas en los dropdowns (para creación y agregar)
-  function renderAsignaturasDropdowns() {
-    const asignaturasSelects = ['select-asignatura-existente'];
-    asignaturasSelects.forEach(selectId => {
-      const selectElem = document.getElementById(selectId);
-      selectElem.innerHTML = '<option value="">Selecciona una asignatura</option>';
-      Object.keys(app.data.subjects).forEach(subject => {
-        const option = document.createElement('option');
-        option.value = subject;
-        option.textContent = subject;
-        selectElem.appendChild(option);
-      });
+}
+
+// Actualizar los temas en el dropdown cuando se selecciona una asignatura en "Agregar a bloque existente"
+document.getElementById('select-asignatura-existente').addEventListener('change', (e) => {
+  const subject = e.target.value;
+  const temasSelect = document.getElementById('select-tema-existente');
+  temasSelect.innerHTML = '<option value="">Selecciona un tema</option>';
+  if (subject && app.data.subjects[subject]) {
+    Object.keys(app.data.subjects[subject].themes).forEach(theme => {
+      const option = document.createElement('option');
+      option.value = theme;
+      option.textContent = theme;
+      temasSelect.appendChild(option);
     });
   }
-  
+});
+
+// Agregar flashcards a un bloque existente
+document.getElementById('btn-agregar-flashcards').addEventListener('click', () => {
+  const subject = document.getElementById('select-asignatura-existente').value;
+  const theme = document.getElementById('select-tema-existente').value;
+  const text = document.getElementById('input-flashcards-agregar').value.trim();
+  if (!subject || !theme || !text) {
+    showNotification('Por favor, complete todos los campos para agregar flashcards.');
+    return;
+  }
+  if (!app.data.subjects[subject] || !app.data.subjects[subject].themes[theme]) {
+    alert('El bloque seleccionado no existe.');
+    return;
+  }
+  const lines = text.split('\n').filter(line => line.trim() !== '');
+  for (let i = 0; i < lines.length; i += 2) {
+    const question = lines[i];
+    const answer = lines[i+1] || '';
+    const flashcard = {
+      id: generateId(),
+      question: question,
+      answer: answer,
+      difficulty: null
+    };
+    app.data.subjects[subject].themes[theme].push(flashcard);
+  }
+  saveData();
+  alert('Flashcards agregadas correctamente.');
+  document.getElementById('input-flashcards-agregar').value = '';
+});
+
   /***********************
    * FUNCIONES PARA CALENDARIO (PLANIFICACIÓN)
    ***********************/
