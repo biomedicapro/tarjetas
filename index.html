@@ -987,7 +987,15 @@ if (themes && typeof themes === 'object') {
       }
     }
   });
+   // Modo noche en estudio
+  document.getElementById('icon-noche').addEventListener('click', () => {
+    toggleNightMode('estudio');
+  });
   
+  // Pantalla completa en estudio
+  document.getElementById('btn-fullscreen').addEventListener('click', () => {
+    toggleFullScreen(document.getElementById('flashcard-container'));
+  });
   // Alternar modo noche: se aplica o remueve la clase 'night-mode'
   function toggleNightMode(mode) {
     if(mode === 'estudio') {
