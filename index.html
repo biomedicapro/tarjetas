@@ -987,7 +987,28 @@ if (themes && typeof themes === 'object') {
       }
     }
   });
-   // Modo noche en estudio
+// Botones para clasificar la flashcard (modo estudio)
+  document.getElementById('icon-facil').addEventListener('click', () => {
+    setFlashcardDifficulty('fácil');
+  });
+  document.getElementById('icon-medio').addEventListener('click', () => {
+    setFlashcardDifficulty('medio');
+  });
+  document.getElementById('icon-dificil').addEventListener('click', () => {
+    setFlashcardDifficulty('difícil');
+  });
+  
+  // Asignar dificultad a la flashcard actual y guardar en LocalStorage
+  function setFlashcardDifficulty(level) {
+    const currentFlashcard = app.state.flashcards[app.state.currentCardIndex];
+    if(currentFlashcard) {
+      currentFlashcard.difficulty = level;
+      saveData();
+      alert('Flashcard clasificada como ' + level);
+    }
+  }
+  
+  // Modo noche en estudio
   document.getElementById('icon-noche').addEventListener('click', () => {
     toggleNightMode('estudio');
   });
@@ -995,8 +1016,7 @@ if (themes && typeof themes === 'object') {
   // Pantalla completa en estudio
   document.getElementById('btn-fullscreen').addEventListener('click', () => {
     toggleFullScreen(document.getElementById('flashcard-container'));
-  });
-  // Alternar modo noche: se aplica o remueve la clase 'night-mode'
+  });  // Alternar modo noche: se aplica o remueve la clase 'night-mode'
   function toggleNightMode(mode) {
     if(mode === 'estudio') {
       const container = document.getElementById('flashcard-container');
