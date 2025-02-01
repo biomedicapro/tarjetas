@@ -674,126 +674,7 @@ if (app.data.subjects[subject] && app.data.subjects[subject].themes) {
     container.setAttribute('data-face', face);
   }
   
-/********** GESTOS EN MODO ESTUDIO CON TRANSICIONES **********/
 
-// Función para animar la transición de la flashcard
-function animateCardTransition(container, animationType, callback) {
-  let keyframesOut, keyframesIn;
-  const timing = { duration: 300, easing: 'ease-out', fill: 'forwards' };
-
-  if (animationType === 'flip') {
-    keyframesOut = [
-      { transform: 'rotateY(0deg)', opacity: 1 },
-      { transform: 'rotateY(90deg)', opacity: 0 }
-    ];
-    keyframesIn = [
-      { transform: 'rotateY(90deg)', opacity: 0 },
-      { transform: 'rotateY(0deg)', opacity: 1 }
-    ];
-  } else if (animationType === 'next') {
-    keyframesOut = [
-      { transform: 'translateY(0)', opacity: 1 },
-      { transform: 'translateY(-100%)', opacity: 0 }
-    ];
-    keyframesIn = [
-      { transform: 'translateY(100%)', opacity: 0 },
-      { transform: 'translateY(0)', opacity: 1 }
-    ];
-  } else if (animationType === 'prev') {
-    keyframesOut = [
-      { transform: 'translateY(0)', opacity: 1 },
-      { transform: 'translateY(100%)', opacity: 0 }
-    ];
-    keyframesIn = [
-      { transform: 'translateY(-100%)', opacity: 0 },
-      { transform: 'translateY(0)', opacity: 1 }
-    ];
-  }
-
-  // Animar salida
-  container.animate(keyframesOut, timing).onfinish = () => {
-    callback();
-    // Animar entrada
-    container.animate(keyframesIn, timing);
-  };
-}
-
-// Para pantallas anchas (≥ 1367px): usar clic en zonas verticales con animación
-document.getElementById('flashcard-container').addEventListener('click', (e) => {
-  if (window.innerWidth >= 1367) {
-    const container = e.currentTarget;
-    const rect = container.getBoundingClientRect();
-    const y = e.clientY - rect.top;
-    const face = container.getAttribute('data-face') || 'question';
-    if (y < rect.height / 3) {
-      // Zona superior: flashcard anterior (si existe)
-      if (app.state.currentCardIndex > 0) {
-        animateCardTransition(container, 'prev', () => {
-          app.state.currentCardIndex--;
-          updateFlashcardContent('question');
-        });
-      }
-    } else if (y < 2 * rect.height / 3) {
-      // Zona central: alternar cara con efecto flip
-      animateCardTransition(container, 'flip', () => {
-        const newFace = (face === 'question') ? 'answer' : 'question';
-        updateFlashcardContent(newFace);
-      });
-    } else {
-      // Zona inferior: siguiente flashcard (si existe)
-      if (app.state.currentCardIndex < app.state.flashcards.length - 1) {
-        animateCardTransition(container, 'next', () => {
-          app.state.currentCardIndex++;
-          updateFlashcardContent('question');
-        });
-      }
-    }
-  }
-});
-
-// Para pantallas pequeñas (< 1367px): detectar arrastre (swipe) para pasar entre caras y flashcards con animación
-document.getElementById('flashcard-container').addEventListener('touchstart', (e) => {
-  if (window.innerWidth < 1367) {
-    touchStartXEstudio = e.changedTouches[0].clientX;
-    touchStartYEstudio = e.changedTouches[0].clientY;
-  }
-});
-document.getElementById('flashcard-container').addEventListener('touchend', (e) => {
-  if (window.innerWidth < 1367 && touchStartXEstudio !== null && touchStartYEstudio !== null) {
-    const container = document.getElementById('flashcard-container');
-    const touchEndX = e.changedTouches[0].clientX;
-    const touchEndY = e.changedTouches[0].clientY;
-    const dx = touchEndX - touchStartXEstudio;
-    const dy = touchEndY - touchStartYEstudio;
-    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) {
-      // Arrastre horizontal: alternar cara con efecto flip
-      animateCardTransition(container, 'flip', () => {
-        const face = container.getAttribute('data-face') || 'question';
-        const newFace = (face === 'question') ? 'answer' : 'question';
-        updateFlashcardContent(newFace);
-      });
-    } else if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 50) {
-      // Arrastre vertical: si dy negativo -> siguiente, si dy positivo -> anterior
-      if (dy < 0) {
-        if (app.state.currentCardIndex < app.state.flashcards.length - 1) {
-          animateCardTransition(container, 'next', () => {
-            app.state.currentCardIndex++;
-            updateFlashcardContent('question');
-          });
-        }
-      } else {
-        if (app.state.currentCardIndex > 0) {
-          animateCardTransition(container, 'prev', () => {
-            app.state.currentCardIndex--;
-            updateFlashcardContent('question');
-          });
-        }
-      }
-    }
-    touchStartXEstudio = null;
-    touchStartYEstudio = null;
-  }
-});
 
 /***********************
  * MODO REPASO
@@ -932,73 +813,8 @@ function updateFlashcardContentRepaso(face) {
     contentDiv.textContent = currentFlashcard[face];
     container.setAttribute('data-face', face);
 }
-
-  /********** GESTOS EN MODO REPASO **********/
-  // Para pantallas anchas (≥ 1367px): usar clic en zonas verticales
-  document.getElementById('flashcard-container-repaso').addEventListener('click', (e) => {
-    if(window.innerWidth >= 1367) {
-      const container = e.currentTarget;
-      const rect = container.getBoundingClientRect();
-      const y = e.clientY - rect.top;
-      const face = container.getAttribute('data-face') || 'question';
-      if(y < rect.height / 3) {
-        // Zona superior: flashcard anterior (si existe)
-        if(app.state.currentCardIndex > 0) {
-          app.state.currentCardIndex--;
-          updateFlashcardContentRepaso('question');
-        }
-      } else if(y < 2 * rect.height / 3) {
-        // Zona central: alternar cara
-        const newFace = (face === 'question') ? 'answer' : 'question';
-        updateFlashcardContentRepaso(newFace);
-      } else {
-        // Zona inferior: siguiente flashcard (si existe)
-        if(app.state.currentCardIndex < app.state.flashcards.length - 1) {
-          app.state.currentCardIndex++;
-          updateFlashcardContentRepaso('question');
-        }
-      }
-    }
-  });
   
-  // Para pantallas pequeñas (< 1367px): detectar arrastre (swipe)
-  let touchStartXRepaso = null, touchStartYRepaso = null;
-  document.getElementById('flashcard-container-repaso').addEventListener('touchstart', (e) => {
-    if(window.innerWidth < 1367) {
-      touchStartXRepaso = e.changedTouches[0].clientX;
-      touchStartYRepaso = e.changedTouches[0].clientY;
-    }
-  });
-  document.getElementById('flashcard-container-repaso').addEventListener('touchend', (e) => {
-    if(window.innerWidth < 1367 && touchStartXRepaso !== null && touchStartYRepaso !== null) {
-      const touchEndX = e.changedTouches[0].clientX;
-      const touchEndY = e.changedTouches[0].clientY;
-      const dx = touchEndX - touchStartXRepaso;
-      const dy = touchEndY - touchStartYRepaso;
-      if(Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) {
-        // Arrastre horizontal: alternar cara
-        const container = document.getElementById('flashcard-container-repaso');
-        const face = container.getAttribute('data-face') || 'question';
-        const newFace = (face === 'question') ? 'answer' : 'question';
-        updateFlashcardContentRepaso(newFace);
-      } else if(Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 50) {
-        // Arrastre vertical: si dy negativo -> siguiente, si dy positivo -> anterior
-        if(dy < 0) {
-          if(app.state.currentCardIndex < app.state.flashcards.length - 1) {
-            app.state.currentCardIndex++;
-            updateFlashcardContentRepaso('question');
-          }
-        } else {
-          if(app.state.currentCardIndex > 0) {
-            app.state.currentCardIndex--;
-            updateFlashcardContentRepaso('question');
-          }
-        }
-      }
-      touchStartXRepaso = null;
-      touchStartYRepaso = null;
-    }
-  });
+
   
   // Botones de clasificación en repaso
   document.getElementById('icon-facil-repaso').addEventListener('click', () => {
@@ -1029,7 +845,204 @@ function updateFlashcardContentRepaso(face) {
   document.getElementById('btn-fullscreen-repaso').addEventListener('click', () => {
     toggleFullScreen(document.getElementById('flashcard-container-repaso'));
   });
-  
+  /********** GESTOS EN MODO ESTUDIO CON TRANSICIONES PERSONALIZADAS **********/
+
+// Función para animar la transición de la flashcard, simulando el paso de páginas
+function animateCardTransition(container, animationType, callback) {
+  let keyframesOut, keyframesIn;
+  // Usamos un timing similar a scroll personalizado
+  const timing = { duration: 400, easing: 'cubic-bezier(0.25, 0.1, 0.25, 1)', fill: 'forwards' };
+
+  if (animationType === 'flip') {
+    // Efecto de "pasar página" al cambiar de cara:
+    keyframesOut = [
+      { transform: 'translateY(0)', opacity: 1 },
+      { transform: 'translateY(-20px)', opacity: 0.5 }
+    ];
+    keyframesIn = [
+      { transform: 'translateY(20px)', opacity: 0.5 },
+      { transform: 'translateY(0)', opacity: 1 }
+    ];
+  } else if (animationType === 'next') {
+    keyframesOut = [
+      { transform: 'translateY(0)', opacity: 1 },
+      { transform: 'translateY(-100%)', opacity: 0 }
+    ];
+    keyframesIn = [
+      { transform: 'translateY(100%)', opacity: 0 },
+      { transform: 'translateY(0)', opacity: 1 }
+    ];
+  } else if (animationType === 'prev') {
+    keyframesOut = [
+      { transform: 'translateY(0)', opacity: 1 },
+      { transform: 'translateY(100%)', opacity: 0 }
+    ];
+    keyframesIn = [
+      { transform: 'translateY(-100%)', opacity: 0 },
+      { transform: 'translateY(0)', opacity: 1 }
+    ];
+  }
+
+  container.animate(keyframesOut, timing).onfinish = () => {
+    callback();
+    container.animate(keyframesIn, timing);
+  };
+}
+
+// GESTOS EN MODO ESTUDIO
+
+// Para pantallas anchas (≥ 1367px): usar clic en zonas verticales con animación
+document.getElementById('flashcard-container').addEventListener('click', (e) => {
+  if (window.innerWidth >= 1367) {
+    const container = e.currentTarget;
+    const rect = container.getBoundingClientRect();
+    const y = e.clientY - rect.top;
+    const face = container.getAttribute('data-face') || 'question';
+    if (y < rect.height / 3) {
+      // Zona superior: flashcard anterior (si existe)
+      if (app.state.currentCardIndex > 0) {
+        animateCardTransition(container, 'prev', () => {
+          app.state.currentCardIndex--;
+          updateFlashcardContent('question');
+        });
+      }
+    } else if (y < 2 * rect.height / 3) {
+      // Zona central: alternar cara con efecto flip
+      animateCardTransition(container, 'flip', () => {
+        const newFace = (face === 'question') ? 'answer' : 'question';
+        updateFlashcardContent(newFace);
+      });
+    } else {
+      // Zona inferior: siguiente flashcard (si existe)
+      if (app.state.currentCardIndex < app.state.flashcards.length - 1) {
+        animateCardTransition(container, 'next', () => {
+          app.state.currentCardIndex++;
+          updateFlashcardContent('question');
+        });
+      }
+    }
+  }
+});
+
+// Para pantallas pequeñas (< 1367px): detectar arrastre (swipe) para alternar cara o pasar entre flashcards con animación
+document.getElementById('flashcard-container').addEventListener('touchstart', (e) => {
+  if (window.innerWidth < 1367) {
+    touchStartXEstudio = e.changedTouches[0].clientX;
+    touchStartYEstudio = e.changedTouches[0].clientY;
+  }
+});
+document.getElementById('flashcard-container').addEventListener('touchend', (e) => {
+  if (window.innerWidth < 1367 && touchStartXEstudio !== null && touchStartYEstudio !== null) {
+    const container = document.getElementById('flashcard-container');
+    const touchEndX = e.changedTouches[0].clientX;
+    const touchEndY = e.changedTouches[0].clientY;
+    const dx = touchEndX - touchStartXEstudio;
+    const dy = touchEndY - touchStartYEstudio;
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) {
+      // Arrastre horizontal: alternar cara
+      animateCardTransition(container, 'flip', () => {
+        const face = container.getAttribute('data-face') || 'question';
+        const newFace = (face === 'question') ? 'answer' : 'question';
+        updateFlashcardContent(newFace);
+      });
+    } else if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 50) {
+      // Arrastre vertical: si dy negativo -> siguiente, si dy positivo -> anterior
+      if (dy < 0) {
+        if (app.state.currentCardIndex < app.state.flashcards.length - 1) {
+          animateCardTransition(container, 'next', () => {
+            app.state.currentCardIndex++;
+            updateFlashcardContent('question');
+          });
+        }
+      } else {
+        if (app.state.currentCardIndex > 0) {
+          animateCardTransition(container, 'prev', () => {
+            app.state.currentCardIndex--;
+            updateFlashcardContent('question');
+          });
+        }
+      }
+    }
+    touchStartXEstudio = null;
+    touchStartYEstudio = null;
+  }
+});
+
+
+// GESTOS EN MODO REPASO
+
+// Para pantallas anchas (≥ 1367px): usar clic en zonas verticales con animación
+document.getElementById('flashcard-container-repaso').addEventListener('click', (e) => {
+  if (window.innerWidth >= 1367) {
+    const container = e.currentTarget;
+    const rect = container.getBoundingClientRect();
+    const y = e.clientY - rect.top;
+    const face = container.getAttribute('data-face') || 'question';
+    if (y < rect.height / 3) {
+      if (app.state.currentCardIndex > 0) {
+        animateCardTransition(container, 'prev', () => {
+          app.state.currentCardIndex--;
+          updateFlashcardContentRepaso('question');
+        });
+      }
+    } else if (y < 2 * rect.height / 3) {
+      animateCardTransition(container, 'flip', () => {
+        const newFace = (face === 'question') ? 'answer' : 'question';
+        updateFlashcardContentRepaso(newFace);
+      });
+    } else {
+      if (app.state.currentCardIndex < app.state.flashcards.length - 1) {
+        animateCardTransition(container, 'next', () => {
+          app.state.currentCardIndex++;
+          updateFlashcardContentRepaso('question');
+        });
+      }
+    }
+  }
+});
+
+// Para pantallas pequeñas (< 1367px): detectar arrastre (swipe)
+document.getElementById('flashcard-container-repaso').addEventListener('touchstart', (e) => {
+  if (window.innerWidth < 1367) {
+    touchStartXRepaso = e.changedTouches[0].clientX;
+    touchStartYRepaso = e.changedTouches[0].clientY;
+  }
+});
+document.getElementById('flashcard-container-repaso').addEventListener('touchend', (e) => {
+  if (window.innerWidth < 1367 && touchStartXRepaso !== null && touchStartYRepaso !== null) {
+    const container = document.getElementById('flashcard-container-repaso');
+    const touchEndX = e.changedTouches[0].clientX;
+    const touchEndY = e.changedTouches[0].clientY;
+    const dx = touchEndX - touchStartXRepaso;
+    const dy = touchEndY - touchStartYRepaso;
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 50) {
+      animateCardTransition(container, 'flip', () => {
+        const face = container.getAttribute('data-face') || 'question';
+        const newFace = (face === 'question') ? 'answer' : 'question';
+        updateFlashcardContentRepaso(newFace);
+      });
+    } else if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > 50) {
+      if (dy < 0) {
+        if (app.state.currentCardIndex < app.state.flashcards.length - 1) {
+          animateCardTransition(container, 'next', () => {
+            app.state.currentCardIndex++;
+            updateFlashcardContentRepaso('question');
+          });
+        }
+      } else {
+        if (app.state.currentCardIndex > 0) {
+          animateCardTransition(container, 'prev', () => {
+            app.state.currentCardIndex--;
+            updateFlashcardContentRepaso('question');
+          });
+        }
+      }
+    }
+    touchStartXRepaso = null;
+    touchStartYRepaso = null;
+  }
+});
+
   /***********************
    * MODO CALENDARIO
    ***********************/
