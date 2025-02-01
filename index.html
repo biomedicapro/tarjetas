@@ -59,17 +59,20 @@
       text-align: center;
       font-size: 1.5em;
     }
-    /* Íconos flotantes en la flashcard */
-    .flashcard-icons {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      display: flex;
-      gap: 10px;
-      z-index: 10;
-    }
+/* Íconos flotantes en la flashcard (alineados verticalmente centrados a la derecha) */
+.flashcard-icons {
+  position: absolute;
+  top: 50%;
+  right: 10px;
+  display: flex;
+  flex-direction: column; /* Apila los íconos verticalmente */
+  gap: 15px;
+  z-index: 10;
+  transform: translateY(-50%); /* Centra verticalmente */
+}
+
     .flashcard-icons i {
-      font-size: 1.5em;
+      font-size: 3em;
       cursor: pointer;
       color: #343a40;
       transition: color 0.3s;
