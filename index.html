@@ -795,118 +795,144 @@ document.getElementById('flashcard-container').addEventListener('touchend', (e) 
   }
 });
 
-  /***********************
-   * MODO REPASO
-   ***********************/
-  
-  // Renderizar asignaturas para repaso (solo aquellas con flashcards clasificadas)
-  function renderRepasoAsignaturas() {
+/***********************
+ * MODO REPASO
+ ***********************/
+
+// Renderizar asignaturas para repaso (solo aquellas con flashcards clasificadas)
+function renderRepasoAsignaturas() {
     const lista = document.getElementById('lista-asignaturas-repaso');
     lista.innerHTML = '';
     let hayAsignaturas = false;
+
     Object.keys(app.data.subjects).forEach(subject => {
-      const themes = app.data.subjects[subject].themes;
-      let subjectTieneClasificadas = false;
-if (themes && typeof themes === 'object') {
-  Object.keys(themes).forEach(theme => {
-    if (Array.isArray(themes[theme]) && themes[theme].some(fc => fc.difficulty !== null)) {
-      subjectTieneClasificadas = true;
+        const themes = app.data.subjects[subject].themes;
+        let subjectTieneClasificadas = false;
+        if (themes && typeof themes === 'object') {
+            Object.keys(themes).forEach(theme => {
+                if (Array.isArray(themes[theme]) && themes[theme].some(fc => fc.difficulty !== null)) {
+                    subjectTieneClasificadas = true;
+                }
+            });
+        }
+
+        if (subjectTieneClasificadas) {
+            hayAsignaturas = true;
+            const li = document.createElement('li');
+            li.className = 'list-group-item list-group-item-action';
+            li.textContent = subject;
+            li.addEventListener('click', () => {
+                app.state.selectedSubject = subject;
+                renderRepasoTemas(subject);
+            });
+            lista.appendChild(li);
+        }
+    });
+
+    if (!hayAsignaturas) {
+        const li = document.createElement('li');
+        li.className = 'list-group-item';
+        li.textContent = 'No hay flashcards clasificadas para repaso';
+        lista.appendChild(li);
     }
-  });
 }
 
-      if (subjectTieneClasificadas) {
-        hayAsignaturas = true;
-        const li = document.createElement('li');
-        li.className = 'list-group-item list-group-item-action';
-        li.textContent = subject;
-        li.addEventListener('click', () => {
-          app.state.selectedSubject = subject;
-          renderRepasoTemas(subject);
-        });
-        lista.appendChild(li);
-      }
-    });
-    if(!hayAsignaturas) {
-      const li = document.createElement('li');
-      li.className = 'list-group-item';
-      li.textContent = 'No hay flashcards clasificadas para repaso';
-      lista.appendChild(li);
-    }
-  }
-  
-  // Renderizar temas para repaso (solo aquellos con flashcards clasificadas)
-  function renderRepasoTemas(subject) {
+// Renderizar temas para repaso (solo aquellos con flashcards clasificadas)
+function renderRepasoTemas(subject) {
     document.getElementById('repaso-asignaturas').classList.add('hidden');
     const temasDiv = document.getElementById('repaso-temas');
     temasDiv.classList.remove('hidden');
     const lista = document.getElementById('lista-temas-repaso');
     lista.innerHTML = '';
     let hayTemas = false;
+
     Object.keys(app.data.subjects[subject].themes).forEach(theme => {
-      if (app.data.subjects[subject].themes[theme].some(fc => fc.difficulty !== null)) {
-        hayTemas = true;
-        const li = document.createElement('li');
-        li.className = 'list-group-item list-group-item-action';
-        li.textContent = theme;
-        li.addEventListener('click', () => {
-          app.state.selectedTheme = theme;
-          // Mostrar selección de dificultad en repaso
-          document.getElementById('repaso-dificultad').classList.remove('hidden');
-        });
-        lista.appendChild(li);
-      }
+        if (app.data.subjects[subject].themes[theme].some(fc => fc.difficulty !== null)) {
+            hayTemas = true;
+            const li = document.createElement('li');
+            li.className = 'list-group-item list-group-item-action';
+            li.textContent = theme;
+            li.addEventListener('click', () => {
+                app.state.selectedTheme = theme;
+                // Mostrar selección de dificultad en repaso
+                document.getElementById('repaso-dificultad').classList.remove('hidden');
+            });
+            lista.appendChild(li);
+        }
     });
-    if(!hayTemas) {
-      const li = document.createElement('li');
-      li.className = 'list-group-item';
-      li.textContent = 'No hay flashcards clasificadas en este tema';
-      lista.appendChild(li);
+
+    if (!hayTemas) {
+        const li = document.createElement('li');
+        li.className = 'list-group-item';
+        li.textContent = 'No hay flashcards clasificadas en este tema';
+        lista.appendChild(li);
     }
-  }
-  
-  // Botones para volver en repaso
-  document.getElementById('btn-volver-asignaturas-repaso').addEventListener('click', () => {
+}
+
+// Botones para volver en repaso
+document.getElementById('btn-volver-asignaturas-repaso').addEventListener('click', () => {
     document.getElementById('repaso-temas').classList.add('hidden');
     document.getElementById('repaso-asignaturas').classList.remove('hidden');
-  });
-  document.getElementById('btn-volver-temas-repaso').addEventListener('click', () => {
+});
+
+document.getElementById('btn-volver-temas-repaso').addEventListener('click', () => {
     document.getElementById('repaso-dificultad').classList.add('hidden');
     document.getElementById('repaso-temas').classList.remove('hidden');
-  });
-  document.getElementById('btn-volver-dificultad-repaso').addEventListener('click', () => {
+});
+
+document.getElementById('btn-volver-dificultad-repaso').addEventListener('click', () => {
     document.getElementById('repaso-flashcards').classList.add('hidden');
     document.getElementById('repaso-dificultad').classList.remove('hidden');
-  });
-  
-  // Selección de dificultad en repaso
-  document.getElementById('lista-dificultad-repaso').addEventListener('click', (e) => {
-    if(e.target && e.target.matches('li')) {
-      const difficulty = e.target.getAttribute('data-difficulty');
-      app.state.selectedDifficulty = difficulty;
-      const allFlashcards = app.data.subjects[app.state.selectedSubject].themes[app.state.selectedTheme];
-      app.state.flashcards = allFlashcards.filter(fc => fc.difficulty === difficulty);
-      app.state.currentCardIndex = 0;
-      if(app.state.flashcards.length === 0) {
-        showNotification('No hay flashcards con esa clasificación.');
-        return;
-      }
-      document.getElementById('repaso-dificultad').classList.add('hidden');
-      document.getElementById('repaso-flashcards').classList.remove('hidden');
-      updateFlashcardContentRepaso('question');
+});
+
+// Salir del modo repaso completamente y volver a la pantalla principal de asignaturas
+document.getElementById('btn-salir-flashcards-repaso').addEventListener('click', () => {
+    if (document.fullscreenElement) {
+        document.exitFullscreen().then(() => {
+            salirModoRepaso();
+        }).catch(err => {
+            console.warn(`Error al salir de pantalla completa: ${err.message}`);
+            salirModoRepaso(); // Asegurar que se oculta correctamente
+        });
+    } else {
+        salirModoRepaso();
     }
-  });
-  
-  // Actualizar el contenido de la flashcard en repaso
-  function updateFlashcardContentRepaso(face) {
+});
+
+// Función para salir del modo repaso
+function salirModoRepaso() {
+    document.getElementById('repaso-flashcards').classList.add('hidden');
+    document.getElementById('repaso-asignaturas').classList.remove('hidden');
+}
+
+// Selección de dificultad en repaso
+document.getElementById('lista-dificultad-repaso').addEventListener('click', (e) => {
+    if (e.target && e.target.matches('li')) {
+        const difficulty = e.target.getAttribute('data-difficulty');
+        app.state.selectedDifficulty = difficulty;
+        const allFlashcards = app.data.subjects[app.state.selectedSubject].themes[app.state.selectedTheme];
+        app.state.flashcards = allFlashcards.filter(fc => fc.difficulty === difficulty);
+        app.state.currentCardIndex = 0;
+        if (app.state.flashcards.length === 0) {
+            showNotification('No hay flashcards con esa clasificación.');
+            return;
+        }
+        document.getElementById('repaso-dificultad').classList.add('hidden');
+        document.getElementById('repaso-flashcards').classList.remove('hidden');
+        updateFlashcardContentRepaso('question');
+    }
+});
+
+// Actualizar el contenido de la flashcard en repaso
+function updateFlashcardContentRepaso(face) {
     const container = document.getElementById('flashcard-container-repaso');
     const contentDiv = document.getElementById('flashcard-content-repaso');
     const currentFlashcard = app.state.flashcards[app.state.currentCardIndex];
     if (!currentFlashcard) return;
     contentDiv.textContent = currentFlashcard[face];
     container.setAttribute('data-face', face);
-  }
-  
+}
+
   /********** GESTOS EN MODO REPASO **********/
   // Para pantallas anchas (≥ 1367px): usar clic en zonas verticales
   document.getElementById('flashcard-container-repaso').addEventListener('click', (e) => {
