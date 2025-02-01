@@ -1076,16 +1076,36 @@ if (themes && typeof themes === 'object') {
     calendar.render();
   }
   
-  // Manejar pantalla completa: al salir se "descongela" la interfaz
-  function toggleFullScreen(elem) {
+// Función para alternar pantalla completa
+function toggleFullScreen(element) {
     if (!document.fullscreenElement) {
-      elem.requestFullscreen().catch(err => {
-        showNotification(`Error al activar pantalla completa: ${err.message}`);
-      });
+        element.requestFullscreen().catch(err => {
+            console.warn(`Error al intentar entrar en pantalla completa: ${err.message}`);
+        });
     } else {
-      document.exitFullscreen();
+        document.exitFullscreen();
     }
-  }
+}
+
+// Botón para salir del modo flashcards en estudio
+document.getElementById('btn-salir-flashcards').addEventListener('click', () => {
+    if (document.fullscreenElement) {
+        document.exitFullscreen().then(() => {
+            salirModoFlashcards();
+        }).catch(err => {
+            console.warn(`Error al salir de pantalla completa: ${err.message}`);
+            salirModoFlashcards(); // Asegurar que el modo flashcards se oculta
+        });
+    } else {
+        salirModoFlashcards();
+    }
+});
+
+// Función para salir del modo flashcards
+function salirModoFlashcards() {
+    document.getElementById('estudio-flashcards').classList.add('hidden');
+    document.getElementById('estudio-temas').classList.remove('hidden');
+}
   
   document.addEventListener("fullscreenchange", function() {
     if (!document.fullscreenElement) {
