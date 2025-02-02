@@ -215,17 +215,34 @@
   cursor: pointer;
 }
 
-/* 🔴 Eventos (Sesiones Planificadas) - SIN CONTENEDOR */
+/* 🔴 Eventos (Sesiones Planificadas) - SOLO LA HORA, SIN VIÑETA */
 #calendar .fc-event {
-  background: none !important; /* Eliminamos cualquier fondo */
-  color: #2d3748 !important; /* Texto oscuro para que sea legible */
+  background: none !important; /* Sin fondo */
+  color: #2d3748 !important; /* Color oscuro */
   font-size: 14px;
   font-weight: bold;
-  text-align: left;
-  padding: 0px 0; /* Eliminamos padding interno */
-  border-radius: 0 !important; /* Quitamos esquinas redondeadas */
-  border: none !important;
-  box-shadow: none !important;
+  text-align: left; /* Asegura alineación a la izquierda */
+  padding: 0 !important; /* Eliminar padding */
+  border: none !important; /* Sin bordes */
+  box-shadow: none !important; /* Sin sombras */
+  display: block !important; /* Para evitar flexbox */
+}
+
+/* 🔹 Eliminar la viñeta en eventos de FullCalendar */
+#calendar .fc-daygrid-dot-event {
+  display: block !important; /* Asegurar que se muestre correctamente */
+  padding-left: 0 !important; /* Eliminar espacio a la izquierda */
+  list-style: none !important; /* Evitar viñetas */
+}
+
+#calendar .fc-daygrid-day-events {
+  text-align: left !important; /* Asegura que todo el contenedor de eventos esté alineado */
+}
+
+/* 🔧 Ajuste de la hora en eventos */
+#calendar .fc-event-time {
+  font-weight: bold;
+  margin-right: 5px;
 }
 
 /* 📱 Responsividad */
