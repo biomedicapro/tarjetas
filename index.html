@@ -148,17 +148,103 @@
     }
   }
   
+
 /* =========================
-   Calendario - Estilo Moderno y Optimizado
+   📅 Calendario Moderno sin Contenedor de Sesiones Planificadas
    ========================= */
 #calendar {
-  max-width: 900px;
-  margin: 20px auto;           /* Margen reducido para optimizar espacio */
-  background: var(--card-bg);
-  border-radius: 8px;          /* Borde más sutil */
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);  /* Sombra ligera y moderna */
-  padding: 10px;               /* Padding reducido */
+  max-width: 800px;
+  margin: 20px auto;
+  background: transparent; /* Eliminamos cualquier fondo */
+  border-radius: 0; /* Quitamos bordes */
+  box-shadow: none; /* Eliminamos sombras para que no haya contorno */
+  padding: 0; /* Eliminamos padding para que las sesiones se muestren directamente */
+  overflow: visible;
 }
+
+/* 🟢 Cabecera del Calendario */
+#calendar .fc-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #2d3748;
+  color: white;
+  padding: 12px;
+  font-size: 16px;
+  font-weight: bold;
+  border-radius: 8px;
+}
+
+/* 🔵 Botones de navegación */
+#calendar .fc-button {
+  background: #3182ce;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 14px;
+  font-weight: 600;
+  transition: background 0.3s ease-in-out;
+}
+
+#calendar .fc-button:hover {
+  background: #2b6cb0;
+}
+
+/* 📆 Días de la semana */
+#calendar .fc-day-header {
+  background: #f1f1f1;
+  padding: 8px;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  color: #2d3748;
+  border-bottom: 2px solid #3182ce;
+}
+
+/* 📅 Celdas de los días */
+#calendar .fc-daygrid-day {
+  padding: 10px;
+  transition: background 0.2s ease-in-out;
+  color: #2d3748;
+  font-weight: 500;
+}
+
+#calendar .fc-daygrid-day:hover {
+  background: rgba(49, 130, 206, 0.1);
+  cursor: pointer;
+}
+
+/* 🔴 Eventos (Sesiones Planificadas) - SIN CONTENEDOR */
+#calendar .fc-event {
+  background: none !important; /* Eliminamos cualquier fondo */
+  color: #2d3748 !important; /* Texto oscuro para que sea legible */
+  font-size: 14px;
+  font-weight: bold;
+  text-align: left;
+  padding: 0px 0; /* Eliminamos padding interno */
+  border-radius: 0 !important; /* Quitamos esquinas redondeadas */
+  border: none !important;
+  box-shadow: none !important;
+}
+
+/* 📱 Responsividad */
+@media (max-width: 768px) {
+  #calendar {
+    max-width: 100%;
+  }
+
+  #calendar .fc-toolbar {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  #calendar .fc-button {
+    padding: 5px 10px;
+    font-size: 12px;
+  }
+}
+
 
 </style>
 </head>
