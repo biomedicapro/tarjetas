@@ -437,19 +437,62 @@ document.addEventListener('DOMContentLoaded', () => {
   /***********************
    * MODO CREACIÓN
    ***********************/
-  function showNotification(message, { background = '#000', color = 'white', duration = 3000 } = {}) {
+function showNotification(message, { background = 'var(--noti-bg)', color = 'var(--noti-text)', duration = 3000 } = {}) {
+  // Crear la notificación
   const notification = Object.assign(document.createElement('div'), { 
     textContent: message, 
     style: `
-      position: fixed; top: 10px; right: 10px; background: ${background};
-      color: ${color}; padding: 8px 12px; border-radius: 4px; font-size: 14px;
-      z-index: 1000; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); 
-      transition: opacity 0.3s ease;`
+      position: fixed; top: 20px; right: 20px; padding: 14px 20px;
+      font-size: 16px; font-family: inherit; font-weight: 600;
+      background: ${background}; color: ${color}; border-radius: 8px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); 
+      z-index: 99999999; text-align: center; white-space: nowrap;
+      opacity: 0; transform: translateY(-20px);
+      transition: opacity 0.3s ease-out, transform 1.3s ease-out;
+      pointer-events: none; max-width: 350px;
+    `
   });
-  document.body.appendChild(notification);
-  setTimeout(() => notification.style.opacity = '0', duration);
+
+  // Animación de entrada
+  requestAnimationFrame(() => {
+    notification.style.opacity = '1';
+    notification.style.transform = 'translateY(0)';
+  });
+
+  // Verificar si la pantalla está en modo completo y añadir al elemento adecuado
+  const targetContainer = document.fullscreenElement || document.documentElement;
+  targetContainer.appendChild(notification);
+
+  // Animación de salida
+  setTimeout(() => {
+    notification.style.opacity = '0';
+    notification.style.transform = 'translateY(-20px)';
+  }, duration);
+
   notification.addEventListener('transitionend', () => notification.remove(), { once: true });
 }
+
+// Estilos CSS adaptables (Modo Claro y Oscuro)
+const style = document.createElement('style');
+style.textContent = `
+  :root {
+    --noti-bg: #2a2a2a;
+    --noti-text: #ffffff;
+  }
+  
+  [data-theme="light"] {
+    --noti-bg: #ffffff;
+    --noti-text: #333333;
+  }
+
+  [data-theme="dark"] {
+    --noti-bg: #1e1e1e;
+    --noti-text: #f1f1f1;
+  }
+`;
+document.head.appendChild(style);
+
+    
   // Guardar un nuevo bloque de flashcards
   document.getElementById('btn-guardar-flashcards').addEventListener('click', () => {
     const subject = document.getElementById('input-nuevo-asignatura').value.trim();
