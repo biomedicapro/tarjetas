@@ -11,108 +11,156 @@
   <!-- FullCalendar CSS -->
   <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet">
   
-  <style>
-    /* =========================
-       Estilos personalizados
-       ========================= */
-    body {
-      background-color: #f8f9fa;
-      margin: 0;
-      padding: 0;
-      font-family: Arial, sans-serif;
-    }
-    /* Barra de navegación personalizada */
-    .navbar-custom {
-      background-color: #343a40;
-    }
-    .navbar-custom .navbar-brand,
-    .navbar-custom .nav-link {
-      color: #ffffff;
-    }
-    /* Clase para ocultar secciones */
-    .hidden {
-      display: none;
-    }
-    .container-section {
-      padding: 20px;
-    }
-    /* Estilos para la flashcard (modo estudio y repaso) */
+<!-- Asegúrate de incluir en tu <head> la fuente Roboto -->
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600&display=swap" rel="stylesheet">
+
+<style>
+  /* =========================
+     Variables y reset
+     ========================= */
+  :root {
+    --primary-color: #343a40;
+    --accent-color: #007bff;
+    --light-bg: #f4f7f6;
+    --card-bg: #ffffff;
+    --card-shadow: rgba(0, 0, 0, 0.1);
+    --font-family: 'Roboto', sans-serif;
+  }
+  
+  /* =========================
+     Globales
+     ========================= */
+  body {
+    background-color: var(--light-bg);
+    margin: 0;
+    padding: 0;
+    font-family: var(--font-family);
+    color: var(--primary-color);
+  }
+  
+  /* =========================
+     Navegación
+     ========================= */
+  .navbar-custom {
+    background-color: var(--primary-color);
+    box-shadow: 0 2px 4px var(--card-shadow);
+  }
+  .navbar-custom .navbar-brand,
+  .navbar-custom .nav-link {
+    color: #fff;
+  }
+  
+  /* =========================
+     Utilidades
+     ========================= */
+  .hidden {
+    display: none;
+  }
+  .container-section {
+    padding: 20px;
+  }
+  
+  /* =========================
+     Flashcards (modo estudio y repaso)
+     ========================= */
+  .flashcard-container {
+    position: relative;
+    margin: 20px auto;
+    width: 90%;
+    max-width: 600px;
+    height: 300px;
+    background-color: var(--card-bg);
+    border-radius: 12px;
+    box-shadow: 0 4px 12px var(--card-shadow);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    user-select: none;
+    cursor: pointer;
+    overflow: hidden;
+    transition: background-color 0.3s, color 0.3s, box-shadow 0.3s;
+  }
+  .flashcard-container:hover {
+    box-shadow: 0 6px 16px rgba(0,0,0,0.15);
+  }
+  .flashcard-content {
+    padding: 20px;
+    text-align: center;
+    font-size: 1.5em;
+    line-height: 1.4;
+  }
+  
+  /* Íconos flotantes en la flashcard (verticalmente centrados a la derecha) */
+  .flashcard-icons {
+    position: absolute;
+    top: 50%;
+    right: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    z-index: 10;
+    transform: translateY(-50%);
+  }
+  .flashcard-icons i {
+    font-size: 2.5em;
+    cursor: pointer;
+    color: var(--primary-color);
+    transition: color 0.3s, transform 0.3s;
+  }
+  .flashcard-icons i:hover {
+    color: var(--accent-color);
+    transform: scale(1.1);
+  }
+  
+  /* Modo noche */
+  .night-mode {
+    background-color: var(--primary-color) !important;
+    color: #fff !important;
+  }
+  .night-mode .flashcard-icons i {
+    color: #fff !important;
+  }
+  
+  /* Botón de regresar */
+  .back-button {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    font-size: 1.8em;
+    cursor: pointer;
+    color: var(--primary-color);
+    z-index: 10;
+    transition: color 0.3s;
+  }
+  .back-button:hover {
+    color: var(--accent-color);
+  }
+  
+  /* =========================
+     Responsividad
+     ========================= */
+  @media (max-width: 768px) {
     .flashcard-container {
-      position: relative;
-      margin: 20px auto;
-      width: 90%;
-      max-width: 600px;
-      height: 300px;
-      border: 2px solid #343a40;
-      border-radius: 10px;
-      background-color: #fff;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      user-select: none;
-      cursor: pointer;
-      overflow: hidden;
-      transition: background-color 0.3s, color 0.3s;
+      height: 250px;
     }
     .flashcard-content {
-      padding: 20px;
-      text-align: center;
-      font-size: 1.5em;
+      font-size: 1.2em;
     }
-/* Íconos flotantes en la flashcard (alineados verticalmente centrados a la derecha) */
-.flashcard-icons {
-  position: absolute;
-  top: 50%;
-  right: 10px;
-  display: flex;
-  flex-direction: column; /* Apila los íconos verticalmente */
-  gap: 15px;
-  z-index: 10;
-  transform: translateY(-50%); /* Centra verticalmente */
+  }
+  
+/* =========================
+   Calendario - Estilo Moderno y Optimizado
+   ========================= */
+#calendar {
+  max-width: 900px;
+  margin: 20px auto;           /* Margen reducido para optimizar espacio */
+  background: var(--card-bg);
+  border-radius: 8px;          /* Borde más sutil */
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);  /* Sombra ligera y moderna */
+  padding: 10px;               /* Padding reducido */
 }
 
-    .flashcard-icons i {
-      font-size: 3em;
-      cursor: pointer;
-      color: #343a40;
-      transition: color 0.3s;
-    }
-    .flashcard-icons i:hover {
-      color: #007bff;
-    }
-    /* Cuando se active el modo noche, se cambia el fondo y se fuerza el color blanco para los íconos */
-    .night-mode {
-      background-color: #343a40 !important;
-      color: #fff !important;
-    }
-    .night-mode .flashcard-icons i {
-      color: #fff !important;
-    }
-    /* Botón de regresar */
-    .back-button {
-      position: absolute;
-      top: 10px;
-      left: 10px;
-      font-size: 1.5em;
-      cursor: pointer;
-      color: #343a40;
-      z-index: 10;
-    }
-    /* Ajustes responsivos */
-    @media (max-width: 768px) {
-      .flashcard-container {
-        height: 250px;
-      }
-      .flashcard-content {
-        font-size: 1.2em;
-      }
-    }
-    /* Contenedor del calendario */
-    #calendar {
-      max-width: 900px;
-      margin: 40px auto;
-    }
-  </style>
+</style>
 </head>
 <body>
   <!-- =============================
